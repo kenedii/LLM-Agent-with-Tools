@@ -2,7 +2,7 @@
 Chat with OpenAI and Deepseek models that have access to tools to display charts, maps, and code within the chat.
 
 This conversational AI interface built with **Streamlit**, allowing interaction with multiple large language models (LLMs) such as **OpenAI GPT models** and **DeepSeek** models.  
-Chats can be saved, reloaded, and enhanced with rich interactive components — like charts, maps, and code editors — dynamically rendered in chat responses.
+Chats can be saved, reloaded, and enhanced with rich interactive components like charts, maps, and code editors that are dynamically rendered in chat responses.
 
 ---
 
@@ -11,7 +11,7 @@ Chats can be saved, reloaded, and enhanced with rich interactive components — 
 - 💬 **Multi-Model Chatting** — switch between OpenAI (GPT-4o, GPT-4o-Mini, GPT-3.5-Turbo) and DeepSeek (Chat, Reasoner).
 - 🧠 **Auto-Saved Conversations** — chats are automatically stored in JSON files and can be renamed or reloaded later.
 - 🧾 **Component-Enhanced Replies** — the AI can include data visualizations, code editors, or maps directly in its responses.
-- ⚙️ **Streamlit UI Components** — minimal yet powerful layout using built-in and community Streamlit components.
+- ⚙️ **Streamlit UI Components** — minimal yet powerful layout using built in and community Streamlit components.
 
 ---
 
@@ -50,17 +50,17 @@ When the AI responds with <map> tags, a Folium map (with markers and zoom) is re
 📊 ECharts (streamlit-echarts)
 
 Renders interactive bar and line charts.
-Used when the AI outputs <chart> tags containing JSON data — ECharts handles dynamic, configurable chart visualizations.
+Used when the AI outputs <chart> tags containing JSON data. ECharts handles dynamic, configurable chart visualizations.
 
 💻 Ace Code Editor (streamlit-ace)
 
 Provides an inline code editor inside the chat.
-When the AI uses <embedcode> tags, users can view and edit runnable code with syntax highlighting in real-time.
+When the AI uses <embedcode> tags, users can view and edit runnable code with syntax highlighting in real time.
 
 📈 Lightweight Charts (streamlit-lightweight-charts)
 
 A compact charting library for time-series or trend data.
-Used via <lightchart> tags — ideal for financial, performance, or continuous data visualization.
+Used via <lightchart> tags. Ideal for financial, performance, or continuous data visualization.
 
 🧭 Option Menu (streamlit-option-menu)
 
