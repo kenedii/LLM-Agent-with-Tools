@@ -16,9 +16,9 @@ st.set_page_config(page_title="AI Chatbot Agent", page_icon="🤖", layout="wide
 CHAT_DIR = "chat_history"
 os.makedirs(CHAT_DIR, exist_ok=True)
 
-# -------------------------
+
 # PROVIDERS AND MODELS
-# -------------------------
+
 PROVIDERS = {
     "openai": {
         "models": [
@@ -41,9 +41,8 @@ try:
 except Exception:
     OPTION_MENU_AVAILABLE = False
 
-# -------------------------
+
 # SIDEBAR SETTINGS
-# -------------------------
 st.sidebar.title("Settings")
 
 provider = st.sidebar.selectbox("LLM Provider:", list(PROVIDERS.keys()),
@@ -57,9 +56,7 @@ selected_model = next(mid for mid, label in model_choices if label == selected_l
 st.session_state["llm_provider"] = provider
 st.session_state["llm_model"] = selected_model
 
-# -------------------------
 # CHAT SESSION MANAGEMENT
-# -------------------------
 st.sidebar.markdown("---")
 st.sidebar.header("Chat Sessions")
 
@@ -163,9 +160,9 @@ if selected_chat and selected_chat != "-- new chat --":
 st.sidebar.markdown("---")
 st.sidebar.write("Chats auto-save after every message and when new chats start.")
 
-# -------------------------
+
 # MAIN CHAT AREA
-# -------------------------
+
 st.title("AI Chatbot Agent")
 st.caption(f"Provider: **{st.session_state.get('llm_provider','openai')}** • "
            f"Model: **{st.session_state.get('llm_model','gpt-3.5-turbo')}** • "
@@ -189,9 +186,8 @@ with chat_placeholder:
             for tag_type, params in message.get("components", []):
                 render_component(tag_type, params)
 
-# -------------------------
 # CHAT INPUT FORM + ACTION BUTTONS BELOW IT
-# -------------------------
+
 st.markdown("---")
 st.markdown("**Type your message and press Enter or click Send**")
 
@@ -210,9 +206,8 @@ if submit and user_text and user_text.strip():
     auto_save_chat()
     st.rerun()
 
-# -------------------------
 # GENERATE ASSISTANT RESPONSE
-# -------------------------
+
 if st.session_state.messages:
     last_msg = st.session_state.messages[-1]
     if last_msg.get("role") == "user" and not last_msg.get("_replied"):
@@ -247,9 +242,7 @@ if st.session_state.messages:
                 })
         st.rerun()
 
-# -------------------------
 # ACTION BUTTONS (below chat input)
-# -------------------------
 st.markdown("---")
 col1, col2, col3 = st.columns(3)
 with col1:
