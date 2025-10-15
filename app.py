@@ -8,19 +8,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
 if not hasattr(st, "rerun"):
     st.rerun = st.experimental_rerun
-
 
 st.set_page_config(page_title="AI Chatbot Agent", page_icon="🤖", layout="wide")
 
 CHAT_DIR = "chat_history"
 os.makedirs(CHAT_DIR, exist_ok=True)
 
-
-# Providers and Models
-
+# -------------------------
+# PROVIDERS AND MODELS
+# -------------------------
 PROVIDERS = {
     "openai": {
         "models": [
@@ -43,25 +41,25 @@ try:
 except Exception:
     OPTION_MENU_AVAILABLE = False
 
+# -------------------------
+# SIDEBAR SETTINGS
+# -------------------------
 st.sidebar.title("Settings")
 
-# --- Provider select ---
 provider = st.sidebar.selectbox("LLM Provider:", list(PROVIDERS.keys()),
                                 index=0, key="provider_select")
 
-# --- Model select ---
 model_choices = PROVIDERS[provider]["models"]
 model_labels = [m[1] for m in model_choices]
 selected_label = st.sidebar.selectbox("Model:", model_labels, index=0, key="model_select")
 selected_model = next(mid for mid, label in model_choices if label == selected_label)
 
-# Store selections
 st.session_state["llm_provider"] = provider
 st.session_state["llm_model"] = selected_model
 
-
-# Chat session management
-
+# -------------------------
+# CHAT SESSION MANAGEMENT
+# -------------------------
 st.sidebar.markdown("---")
 st.sidebar.header("Chat Sessions")
 
@@ -80,12 +78,10 @@ available = st.session_state.available_chats
 selected_chat = st.sidebar.selectbox("Saved chats:", (["-- new chat --"] + available),
                                      key="saved_chat_select")
 
-# --- Helper ---
 def sanitize_filename(name: str):
     return re.sub(r'[^a-zA-Z0-9_\-]', '_', name).strip('_') or "chat"
 
 def auto_save_chat():
-    """Save chat automatically after every message."""
     if not st.session_state.messages:
         return
     name = st.session_state.get("chat_name", "Untitled")
@@ -167,9 +163,10 @@ if selected_chat and selected_chat != "-- new chat --":
 st.sidebar.markdown("---")
 st.sidebar.write("Chats auto-save after every message and when new chats start.")
 
-
-# Main chat area
-st.title("🤖 AI Chatbot Agent — Multi-Model Edition")
+# -------------------------
+# MAIN CHAT AREA
+# -------------------------
+st.title("AI Chatbot Agent")
 st.caption(f"Provider: **{st.session_state.get('llm_provider','openai')}** • "
            f"Model: **{st.session_state.get('llm_model','gpt-3.5-turbo')}** • "
            f"Chat: **{st.session_state.get('chat_name','Untitled')}**")
@@ -192,31 +189,30 @@ with chat_placeholder:
             for tag_type, params in message.get("components", []):
                 render_component(tag_type, params)
 
-# New Streamlit chat input handles Enter automatically
-user_prompt = st.chat_input("Type your message and press Enter")
+# -------------------------
+# CHAT INPUT FORM + ACTION BUTTONS BELOW IT
+# -------------------------
+st.markdown("---")
+st.markdown("**Type your message and press Enter or click Send**")
 
-# Also include a Send button for mouse users
-send = st.button("Send")
+with st.form(key="chat_form", clear_on_submit=False):
+    user_text = st.text_input("Your message", key="manual_chat_input", placeholder="Type your message here...")
+    submit = st.form_submit_button("Send")
 
-# Either pressing Enter or clicking Send will trigger this
-if user_prompt or send:
-    if user_prompt:  # chat_input returns value only when Enter is pressed
-        message_text = user_prompt
-    else:
-        # Fallback: if user clicked Send without pressing Enter
-        message_text = st.session_state.get("chat_input", "")
+if submit and user_text and user_text.strip():
+    message_text = user_text.strip()
+    if not st.session_state.messages:
+        chat_name_guess = re.sub(r'[^a-zA-Z0-9_\-]', '_', message_text[:30]).strip('_') or "chat"
+        st.session_state.chat_name = chat_name_guess
 
-    if message_text.strip():
-        # Auto name new chats
-        if not st.session_state.messages:
-            chat_name = re.sub(r'[^a-zA-Z0-9_\-]', '_', message_text[:30]).strip('_') or "chat"
-            st.session_state.chat_name = chat_name
-        st.session_state.messages.append({"role": "user", "content": message_text, "components": []})
-        auto_save_chat()
-        st.rerun()
+    st.session_state.messages.append({"role": "user", "content": message_text, "components": []})
+    st.session_state.pop("manual_chat_input", None)  # safely clear
+    auto_save_chat()
+    st.rerun()
 
-
-# Generate assistant response
+# -------------------------
+# GENERATE ASSISTANT RESPONSE
+# -------------------------
 if st.session_state.messages:
     last_msg = st.session_state.messages[-1]
     if last_msg.get("role") == "user" and not last_msg.get("_replied"):
@@ -251,17 +247,19 @@ if st.session_state.messages:
                 })
         st.rerun()
 
-# Quick actions
-
+# -------------------------
+# ACTION BUTTONS (below chat input)
+# -------------------------
+st.markdown("---")
 col1, col2, col3 = st.columns(3)
 with col1:
-    if st.button("Clear Chat (local)"):
+    if st.button("🧹 Clear Chat (local)"):
         st.session_state.messages = []
         st.session_state.chat_name = "Untitled"
         st.success("Cleared chat.")
 
 with col2:
-    if st.button("Export Chat (.json)"):
+    if st.button("📤 Export Chat (.json)"):
         payload = {
             "chat_name": st.session_state.get("chat_name", "Untitled"),
             "provider": st.session_state.get("llm_provider", "openai"),
@@ -274,7 +272,7 @@ with col2:
                            file_name=fname, mime="application/json")
 
 with col3:
-    if st.button("Save to history"):
+    if st.button("💾 Save to history"):
         name = st.session_state.get("chat_name_input", st.session_state.get("chat_name", "Untitled")).strip()
         if not name:
             st.error("Please set a chat name in the sidebar to save.")
